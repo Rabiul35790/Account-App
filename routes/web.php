@@ -33,13 +33,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Data endpoints (session-based auth)
     Route::get('/api/dashboard/stats', [DashboardController::class, 'stats']);
-    Route::post('/api/categories/bulk-delete', [CategoryController::class, 'bulkDestroy']);
-    Route::apiResource('/api/categories', CategoryController::class)->names('api.');
-    Route::post('/api/transactions/bulk-delete', [TransactionController::class, 'bulkDestroy']);
-    Route::apiResource('/api/transactions', TransactionController::class)->names('api.');
-    Route::get('/api/budgets/spending', [BudgetController::class, 'spending']);
-    Route::post('/api/budgets/bulk-delete', [BudgetController::class, 'bulkDestroy']);
-    Route::apiResource('/api/budgets', BudgetController::class)->names('api.');
+    Route::name('api.')->group(function () {
+        Route::post('/api/categories/bulk-delete', [CategoryController::class, 'bulkDestroy']);
+        Route::apiResource('/api/categories', CategoryController::class);
+        Route::post('/api/transactions/bulk-delete', [TransactionController::class, 'bulkDestroy']);
+        Route::apiResource('/api/transactions', TransactionController::class);
+        Route::get('/api/budgets/spending', [BudgetController::class, 'spending']);
+        Route::post('/api/budgets/bulk-delete', [BudgetController::class, 'bulkDestroy']);
+        Route::apiResource('/api/budgets', BudgetController::class);
+    });
     Route::get('/api/reports/summary', [ReportController::class, 'summary']);
     Route::get('/api/activity-logs', [ActivityLogController::class, 'index']);
     Route::get('/api/trash', [TrashController::class, 'index']);
