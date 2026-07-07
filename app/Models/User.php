@@ -10,13 +10,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'company_name', 'phone', 'logo_path', 'primary_color'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $appends = ['logo_url'];
 
     /**
      * Get the attributes that should be cast.
@@ -41,6 +44,11 @@ class User extends Authenticatable
     public function recurringTransactions(): HasMany
     {
         return $this->hasMany(RecurringTransaction::class);
+    }
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        return $this->logo_path ? Storage::url($this->logo_path) : null;
     }
 
     protected function casts(): array

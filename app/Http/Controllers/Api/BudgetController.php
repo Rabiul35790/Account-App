@@ -12,7 +12,6 @@ class BudgetController extends Controller
     public function index(): JsonResponse
     {
         $budgets = Budget::with('category')
-            ->where('user_id', auth()->id())
             ->orderBy('start_date', 'desc')
             ->get();
 
@@ -38,8 +37,6 @@ class BudgetController extends Controller
 
     public function update(Request $request, Budget $budget): JsonResponse
     {
-        abort_if($budget->user_id !== auth()->id(), 403);
-
         $validated = $request->validate([
             'category_id' => 'sometimes|exists:categories,id',
             'amount' => 'sometimes|numeric|min:0.01',
@@ -55,29 +52,25 @@ class BudgetController extends Controller
 
     public function destroy(Budget $budget): JsonResponse
     {
-        abort_if($budget->user_id !== auth()->id(), 403);
         $budget->delete();
         return response()->json(null, 204);
     }
 
     public function spending(): JsonResponse
     {
-        $userId = auth()->id();
         $now = now();
         $monthStart = $now->copy()->startOfMonth();
 
         $budgets = Budget::with('category')
-            ->where('user_id', $userId)
             ->where('start_date', '<=', $now)
             ->where(function ($q) use ($now) {
                 $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
             })
             ->get()
-            ->map(function ($budget) use ($userId, $monthStart) {
+            ->map(function ($budget) use ($monthStart) {
                 $spent = 0;
                 if ($budget->period === 'monthly') {
-                    $spent = \App\Models\Transaction::where('user_id', $userId)
-                        ->where('category_id', $budget->category_id)
+                    $spent = \App\Models\Transaction::where('category_id', $budget->category_id)
                         ->where('type', 'expense')
                         ->where('date', '>=', $monthStart)
                         ->sum('amount');
@@ -91,5 +84,12 @@ class BudgetController extends Controller
             });
 
         return response()->json($budgets);
+    }
+
+    public function bulkDestroy(Request $request): JsonResponse
+    {
+        $ids = $request->validate(['ids' => 'required|array'])['ids'];
+        Budget::whereIn('id', $ids)->delete();
+        return response()->json(['message' => 'Budgets deleted.']);
     }
 }

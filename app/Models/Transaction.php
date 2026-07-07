@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
 {
+    use SoftDeletes, Auditable;
+
     protected $fillable = [
         'user_id', 'category_id', 'type', 'amount', 'description',
-        'date', 'is_recurring', 'receipt_path', 'notes'
+        'date', 'is_recurring', 'receipt_path', 'notes',
+        'created_by', 'updated_by', 'deleted_by',
     ];
 
     protected function casts(): array

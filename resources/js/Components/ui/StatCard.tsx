@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { formatCurrency } from '@/lib/currency';
 
 interface StatCardProps {
     title: string;
@@ -19,12 +20,12 @@ export default function StatCard({ title, value, icon, color = 'indigo', trend }
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                        {typeof value === 'number' ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value) : value}
+                    <p className="text-sm font-medium text-gray-500">{title}</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">
+                        {typeof value === 'number' ? formatCurrency(value) : value}
                     </p>
                     {trend && (
                         <p className={`text-sm mt-1 ${trend.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>

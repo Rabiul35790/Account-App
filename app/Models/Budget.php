@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Budget extends Model
 {
+    use SoftDeletes, Auditable;
+
     protected $fillable = [
-        'user_id', 'category_id', 'amount', 'period', 'start_date', 'end_date'
+        'user_id', 'category_id', 'amount', 'period', 'start_date', 'end_date',
+        'created_by', 'updated_by', 'deleted_by',
     ];
 
     protected function casts(): array

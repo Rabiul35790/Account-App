@@ -12,11 +12,9 @@ class ReportController extends Controller
 {
     public function summary(Request $request): JsonResponse
     {
-        $userId = auth()->id();
         $year = $request->year ?? now()->year;
 
-        $monthlyData = Transaction::where('user_id', $userId)
-            ->whereYear('date', $year)
+        $monthlyData = Transaction::whereYear('date', $year)
             ->select(
                 DB::raw("DATE_FORMAT(date, '%Y-%m') as month"),
                 DB::raw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income"),
@@ -29,8 +27,7 @@ class ReportController extends Controller
         $totalIncome = $monthlyData->sum('income');
         $totalExpense = $monthlyData->sum('expense');
 
-        $categoryBreakdown = Transaction::where('user_id', $userId)
-            ->whereYear('date', $year)
+        $categoryBreakdown = Transaction::whereYear('date', $year)
             ->where('type', $request->type ?? 'expense')
             ->select('category_id', DB::raw('SUM(amount) as total'))
             ->groupBy('category_id')

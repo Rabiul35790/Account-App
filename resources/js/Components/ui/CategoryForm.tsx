@@ -20,15 +20,16 @@ export default function CategoryForm({ initialData, onSubmit, onCancel, isSubmit
         onSubmit({ name, type, description: description || null, color });
     };
 
+    const inputClass = "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors";
+    const labelClass = "block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider";
+
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-2">
+        <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="flex gap-2 p-1 bg-gray-50 rounded-lg">
                 {(['expense', 'income'] as const).map(t => (
                     <button key={t} type="button" onClick={() => setType(t)}
-                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
-                            type === t
-                                ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
-                                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                        className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                            type === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                         }`}>
                         {t === 'expense' ? 'Expense' : 'Income'}
                     </button>
@@ -36,23 +37,21 @@ export default function CategoryForm({ initialData, onSubmit, onCancel, isSubmit
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} required
-                    className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                <label className={labelClass}>Name</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Category name" className={inputClass} />
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                <input type="text" value={description} onChange={e => setDescription(e.target.value)}
-                    className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                <label className={labelClass}>Description</label>
+                <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Brief description" className={inputClass} />
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
+                <label className={labelClass}>Color</label>
                 <div className="flex gap-2 flex-wrap">
                     {COLORS.map(c => (
                         <button key={c} type="button" onClick={() => setColor(c)}
-                            className={`w-8 h-8 rounded-full ${color === c ? 'ring-2 ring-offset-2 ring-indigo-500' : ''}`}
+                            className={`w-8 h-8 rounded-full transition-all ${color === c ? 'ring-2 ring-offset-2 ring-indigo-500 scale-110' : 'hover:scale-110'}`}
                             style={{ backgroundColor: c }} />
                     ))}
                 </div>
@@ -60,12 +59,12 @@ export default function CategoryForm({ initialData, onSubmit, onCancel, isSubmit
 
             <div className="flex gap-3 pt-2">
                 <button type="button" onClick={onCancel}
-                    className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    className="flex-1 py-2.5 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
                     Cancel
                 </button>
                 <button type="submit" disabled={isSubmitting}
-                    className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-                    {isSubmitting ? 'Saving...' : 'Save'}
+                    className="flex-1 py-2.5 px-4 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+                    {isSubmitting ? 'Saving...' : 'Save Category'}
                 </button>
             </div>
         </form>

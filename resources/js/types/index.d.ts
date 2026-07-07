@@ -5,6 +5,15 @@ export interface User {
     company_name: string | null;
     phone: string | null;
     email_verified_at: string | null;
+    logo_url: string | null;
+    primary_color: string | null;
+}
+
+export interface GlobalSettings {
+    company_name: string | null;
+    phone: string | null;
+    primary_color: string;
+    logo_url: string | null;
 }
 
 export interface Category {

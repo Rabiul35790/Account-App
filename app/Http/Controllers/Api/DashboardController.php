@@ -13,41 +13,34 @@ class DashboardController extends Controller
 {
     public function stats(): JsonResponse
     {
-        $userId = auth()->id();
         $now = now();
         $monthStart = $now->copy()->startOfMonth();
         $monthEnd = $now->copy()->endOfMonth();
 
-        $monthlyIncome = Transaction::where('user_id', $userId)
-            ->where('type', 'income')
+        $monthlyIncome = Transaction::where('type', 'income')
             ->whereBetween('date', [$monthStart, $monthEnd])
             ->sum('amount');
 
-        $monthlyExpense = Transaction::where('user_id', $userId)
-            ->where('type', 'expense')
+        $monthlyExpense = Transaction::where('type', 'expense')
             ->whereBetween('date', [$monthStart, $monthEnd])
             ->sum('amount');
 
-        $balance = Transaction::where('user_id', $userId)
-            ->selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) - SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as balance")
+        $balance = Transaction::selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) - SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as balance")
             ->value('balance');
 
         $recentTransactions = Transaction::with('category')
-            ->where('user_id', $userId)
             ->latest('date')
             ->limit(10)
             ->get();
 
-        $expenseByCategory = Transaction::where('user_id', $userId)
-            ->where('type', 'expense')
+        $expenseByCategory = Transaction::where('type', 'expense')
             ->whereBetween('date', [$monthStart, $monthEnd])
             ->select('category_id', DB::raw('SUM(amount) as total'))
             ->groupBy('category_id')
             ->with('category')
             ->get();
 
-        $monthlyTrend = Transaction::where('user_id', $userId)
-            ->select(
+        $monthlyTrend = Transaction::select(
                 DB::raw("DATE_FORMAT(date, '%Y-%m') as month"),
                 DB::raw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income"),
                 DB::raw("SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense")

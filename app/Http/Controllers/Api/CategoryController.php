@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Category::where('user_id', auth()->id());
+        $query = Category::query();
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -39,14 +39,11 @@ class CategoryController extends Controller
 
     public function show(Category $category): JsonResponse
     {
-        abort_if($category->user_id !== auth()->id(), 403);
         return response()->json($category);
     }
 
     public function update(Request $request, Category $category): JsonResponse
     {
-        abort_if($category->user_id !== auth()->id(), 403);
-
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'type' => 'sometimes|in:income,expense',
@@ -63,8 +60,14 @@ class CategoryController extends Controller
 
     public function destroy(Category $category): JsonResponse
     {
-        abort_if($category->user_id !== auth()->id(), 403);
         $category->delete();
         return response()->json(null, 204);
+    }
+
+    public function bulkDestroy(Request $request): JsonResponse
+    {
+        $ids = $request->validate(['ids' => 'required|array'])['ids'];
+        Category::whereIn('id', $ids)->delete();
+        return response()->json(['message' => 'Categories deleted.']);
     }
 }

@@ -11,8 +11,7 @@ class TransactionController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Transaction::with('category')
-            ->where('user_id', auth()->id());
+        $query = Transaction::with('category');
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -66,14 +65,11 @@ class TransactionController extends Controller
 
     public function show(Transaction $transaction): JsonResponse
     {
-        abort_if($transaction->user_id !== auth()->id(), 403);
         return response()->json($transaction->load('category'));
     }
 
     public function update(Request $request, Transaction $transaction): JsonResponse
     {
-        abort_if($transaction->user_id !== auth()->id(), 403);
-
         $validated = $request->validate([
             'category_id' => 'nullable|exists:categories,id',
             'type' => 'sometimes|in:income,expense',
@@ -90,8 +86,14 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction): JsonResponse
     {
-        abort_if($transaction->user_id !== auth()->id(), 403);
         $transaction->delete();
         return response()->json(null, 204);
+    }
+
+    public function bulkDestroy(Request $request): JsonResponse
+    {
+        $ids = $request->validate(['ids' => 'required|array'])['ids'];
+        Transaction::whereIn('id', $ids)->delete();
+        return response()->json(['message' => 'Transactions deleted.']);
     }
 }
