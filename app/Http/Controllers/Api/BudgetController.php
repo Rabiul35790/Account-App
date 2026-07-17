@@ -75,8 +75,7 @@ class BudgetController extends Controller
                 } elseif ($budget->period === 'quarterly') {
                     $query->where('date', '>=', $now->copy()->startOfQuarter());
                 } elseif ($budget->period === 'half_yearly') {
-                    $halfStart = $now->month <= 6 ? $now->copy()->month(1)->startOfMonth() : $now->copy()->month(7)->startOfMonth();
-                    $query->where('date', '>=', $halfStart);
+                    $query->where('date', '>=', $budget->start_date);
                 } elseif ($budget->period === 'yearly') {
                     $query->where('date', '>=', $now->copy()->startOfYear());
                 }
