@@ -59,7 +59,6 @@ class BudgetController extends Controller
     public function spending(): JsonResponse
     {
         $now = now();
-        $monthStart = $now->copy()->startOfMonth();
 
         $budgets = Budget::with('category')
             ->where('start_date', '<=', $now)
@@ -67,14 +66,19 @@ class BudgetController extends Controller
                 $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
             })
             ->get()
-            ->map(function ($budget) use ($monthStart) {
-                $spent = 0;
+            ->map(function ($budget) use ($now) {
+                $query = \App\Models\Transaction::where('category_id', $budget->category_id)
+                    ->where('type', 'expense');
+
                 if ($budget->period === 'monthly') {
-                    $spent = \App\Models\Transaction::where('category_id', $budget->category_id)
-                        ->where('type', 'expense')
-                        ->where('date', '>=', $monthStart)
-                        ->sum('amount');
+                    $query->where('date', '>=', $now->copy()->startOfMonth());
+                } elseif ($budget->period === 'quarterly') {
+                    $query->where('date', '>=', $now->copy()->startOfQuarter());
+                } elseif ($budget->period === 'yearly') {
+                    $query->where('date', '>=', $now->copy()->startOfYear());
                 }
+
+                $spent = $query->sum('amount');
 
                 $budget->spent = (float) $spent;
                 $budget->remaining = (float) ($budget->amount - $spent);
@@ -89,7 +93,7 @@ class BudgetController extends Controller
     public function bulkDestroy(Request $request): JsonResponse
     {
         $ids = $request->validate(['ids' => 'required|array'])['ids'];
-        Budget::whereIn('id', $ids)->delete();
+        Budget::whereIn('id', $ids)->get()->each->delete();
         return response()->json(['message' => 'Budgets deleted.']);
     }
 }

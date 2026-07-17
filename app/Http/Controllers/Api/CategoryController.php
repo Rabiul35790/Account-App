@@ -67,7 +67,7 @@ class CategoryController extends Controller
     public function bulkDestroy(Request $request): JsonResponse
     {
         $ids = $request->validate(['ids' => 'required|array'])['ids'];
-        Category::whereIn('id', $ids)->delete();
+        Category::whereIn('id', $ids)->get()->each->delete();
         return response()->json(['message' => 'Categories deleted.']);
     }
 }

@@ -93,7 +93,7 @@ class TransactionController extends Controller
     public function bulkDestroy(Request $request): JsonResponse
     {
         $ids = $request->validate(['ids' => 'required|array'])['ids'];
-        Transaction::whereIn('id', $ids)->delete();
+        Transaction::whereIn('id', $ids)->get()->each->delete();
         return response()->json(['message' => 'Transactions deleted.']);
     }
 }

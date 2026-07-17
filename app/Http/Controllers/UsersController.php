@@ -63,7 +63,7 @@ class UsersController extends Controller
         if (in_array(auth()->id(), $ids)) {
             return redirect()->back()->with('error', 'You cannot delete yourself.');
         }
-        User::whereIn('id', $ids)->delete();
+        User::whereIn('id', $ids)->get()->each->delete();
         return redirect()->back()->with('success', 'Users deleted successfully.');
     }
 }
