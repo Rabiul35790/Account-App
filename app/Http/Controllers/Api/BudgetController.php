@@ -70,15 +70,7 @@ class BudgetController extends Controller
                 $query = \App\Models\Transaction::where('category_id', $budget->category_id)
                     ->where('type', 'expense');
 
-                if ($budget->period === 'monthly') {
-                    $query->where('date', '>=', $now->copy()->startOfMonth());
-                } elseif ($budget->period === 'quarterly') {
-                    $query->where('date', '>=', $now->copy()->startOfQuarter());
-                } elseif ($budget->period === 'half_yearly') {
-                    $query->where('date', '>=', $budget->start_date);
-                } elseif ($budget->period === 'yearly') {
-                    $query->where('date', '>=', $now->copy()->startOfYear());
-                }
+                $query->where('date', '>=', $budget->start_date);
 
                 $spent = $query->sum('amount');
 
