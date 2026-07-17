@@ -23,7 +23,7 @@ class BudgetController extends Controller
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'amount' => 'required|numeric|min:0.01',
-            'period' => 'required|in:monthly,quarterly,yearly',
+            'period' => 'required|in:monthly,quarterly,half_yearly,yearly',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after:start_date',
         ]);
@@ -40,7 +40,7 @@ class BudgetController extends Controller
         $validated = $request->validate([
             'category_id' => 'sometimes|exists:categories,id',
             'amount' => 'sometimes|numeric|min:0.01',
-            'period' => 'sometimes|in:monthly,quarterly,yearly',
+            'period' => 'sometimes|in:monthly,quarterly,half_yearly,yearly',
             'start_date' => 'sometimes|date',
             'end_date' => 'nullable|date|after:start_date',
         ]);
@@ -74,6 +74,9 @@ class BudgetController extends Controller
                     $query->where('date', '>=', $now->copy()->startOfMonth());
                 } elseif ($budget->period === 'quarterly') {
                     $query->where('date', '>=', $now->copy()->startOfQuarter());
+                } elseif ($budget->period === 'half_yearly') {
+                    $halfStart = $now->month <= 6 ? $now->copy()->month(1)->startOfMonth() : $now->copy()->month(7)->startOfMonth();
+                    $query->where('date', '>=', $halfStart);
                 } elseif ($budget->period === 'yearly') {
                     $query->where('date', '>=', $now->copy()->startOfYear());
                 }

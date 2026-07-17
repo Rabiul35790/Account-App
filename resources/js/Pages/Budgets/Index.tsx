@@ -201,6 +201,7 @@ export default function BudgetList() {
                         <select value={form.period} onChange={e => setForm({ ...form, period: e.target.value })} className={inputClass}>
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
+                            <option value="half_yearly">Half-Yearly</option>
                             <option value="yearly">Yearly</option>
                         </select>
                     </div>
